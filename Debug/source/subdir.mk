@@ -4,18 +4,21 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../source/bootloader.c \
 ../source/clock.c \
 ../source/main.c \
 ../source/port.c \
 ../source/uart.c 
 
 C_DEPS += \
+./source/bootloader.d \
 ./source/clock.d \
 ./source/main.d \
 ./source/port.d \
 ./source/uart.d 
 
 OBJS += \
+./source/bootloader.o \
 ./source/clock.o \
 ./source/main.o \
 ./source/port.o \
@@ -34,7 +37,7 @@ source/%.o: ../source/%.c source/subdir.mk
 clean: clean-source
 
 clean-source:
-	-$(RM) ./source/clock.d ./source/clock.o ./source/main.d ./source/main.o ./source/port.d ./source/port.o ./source/uart.d ./source/uart.o
+	-$(RM) ./source/bootloader.d ./source/bootloader.o ./source/clock.d ./source/clock.o ./source/main.d ./source/main.o ./source/port.d ./source/port.o ./source/uart.d ./source/uart.o
 
 .PHONY: clean-source
 
