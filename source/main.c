@@ -9,6 +9,8 @@
 #include "uart.h"
 #include "clock.h"
 #include "port.h"
+#include <stdarg.h>
+#include <stdio.h>
 
 LPUART_InitStruct_t LPUART_InitStruct = {
 	.BaudRate = 115200,
@@ -35,6 +37,19 @@ void UART_ISR(void)
 	UART_WriteByte(LPUART0, data);
 }
 
+void Serial_Printf(char *format, ...)
+{
+	char buffer[100];
+	va_list args;
+	va_start(args, format);
+	vsnprintf(buffer, sizeof(buffer), format, args);
+	va_end(args);
+	for(int i = 0; buffer[i] != '\0'; i++)
+	{
+		UART_WriteByte(LPUART0, buffer[i]);
+	}
+}
+
 int main()
 {
 	/* Enable clock for PORTB */
@@ -42,9 +57,8 @@ int main()
 	PORT_Pin_Init(PORT_INS_B, 0, &config);
 	PORT_Pin_Init(PORT_INS_B, 1, &config);
 	UART_Init(LPUART0, &LPUART_InitStruct);
-	UART_WriteByte(LPUART0, 'A');
-	UART_Write(LPUART0, "PRESS AND HOLD BUTTON 1 FOR 2S TO START DOWNLOADING THE SREC FILE...\r\n", 70);
 	UART_RegisterHandler(LPUART0, UART_ISR);
+	Serial_Printf("Hello World\n");
 	while (1)
 	{
 	}
