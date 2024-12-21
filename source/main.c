@@ -11,6 +11,9 @@
 #include "port.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include "bootloader.h"
+#include "KE16_Flash.h"
+#include "parsing_srec.h"
 
 LPUART_InitStruct_t LPUART_InitStruct = {
 	.BaudRate = 115200,
@@ -44,7 +47,7 @@ void Serial_Printf(char *format, ...)
 	va_start(args, format);
 	vsnprintf(buffer, sizeof(buffer), format, args);
 	va_end(args);
-	for(int i = 0; buffer[i] != '\0'; i++)
+	for (int i = 0; buffer[i] != '\0'; i++)
 	{
 		UART_WriteByte(LPUART0, buffer[i]);
 	}
@@ -59,6 +62,8 @@ int main()
 	UART_Init(LPUART0, &LPUART_InitStruct);
 	UART_RegisterHandler(LPUART0, UART_ISR);
 	Serial_Printf("Hello World\n");
+	Serial_Printf("Jump to APP %d", APPLICATION_ADRESS_1);
+
 	while (1)
 	{
 	}

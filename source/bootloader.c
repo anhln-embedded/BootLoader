@@ -7,6 +7,10 @@
 
 #include "bootloader.h"
 
+void BootInit(void){
+	__enable_irq();
+}
+
 void BootJumpToApplication(uint32_t address){
     /* Disable interrupts before jump to Apptication */
     __disable_irq();

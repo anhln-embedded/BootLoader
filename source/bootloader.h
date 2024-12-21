@@ -10,8 +10,9 @@
 
 #include "MKE16Z4.h"
 
-#define APPLICATION_ADRESS_1 0x2000
+#define APPLICATION_ADRESS_1 0x3000
 
+void BootInit(void);
 void BootJumpToApplication(uint32_t address);
 void BootFirmwareUpdate(void);
 

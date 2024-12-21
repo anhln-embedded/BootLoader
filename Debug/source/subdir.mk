@@ -4,23 +4,29 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../source/KE16_Flash.c \
 ../source/bootloader.c \
 ../source/clock.c \
 ../source/main.c \
+../source/parsing_srec.c \
 ../source/port.c \
 ../source/uart.c 
 
 C_DEPS += \
+./source/KE16_Flash.d \
 ./source/bootloader.d \
 ./source/clock.d \
 ./source/main.d \
+./source/parsing_srec.d \
 ./source/port.d \
 ./source/uart.d 
 
 OBJS += \
+./source/KE16_Flash.o \
 ./source/bootloader.o \
 ./source/clock.o \
 ./source/main.o \
+./source/parsing_srec.o \
 ./source/port.o \
 ./source/uart.o 
 
@@ -37,7 +43,7 @@ source/%.o: ../source/%.c source/subdir.mk
 clean: clean-source
 
 clean-source:
-	-$(RM) ./source/bootloader.d ./source/bootloader.o ./source/clock.d ./source/clock.o ./source/main.d ./source/main.o ./source/port.d ./source/port.o ./source/uart.d ./source/uart.o
+	-$(RM) ./source/KE16_Flash.d ./source/KE16_Flash.o ./source/bootloader.d ./source/bootloader.o ./source/clock.d ./source/clock.o ./source/main.d ./source/main.o ./source/parsing_srec.d ./source/parsing_srec.o ./source/port.d ./source/port.o ./source/uart.d ./source/uart.o
 
 .PHONY: clean-source
 
