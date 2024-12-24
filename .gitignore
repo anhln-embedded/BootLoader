@@ -1,3 +1,11 @@
+esp_aws_datalog/.pio
+esp_aws_datalog/.vscode/.browse.c_cpp.db*
+esp_aws_datalog/.vscode/c_cpp_properties.json
+esp_aws_datalog/.vscode/launch.json
+esp_aws_datalog/.vscode/ipch
+esp_aws_datalog/src/env.h
+
+
 # Prerequisites
 *.d
 
@@ -45,11 +53,9 @@
 # Kernel Module Compile Results
 *.mod*
 *.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
+
 
 # Debug directory
-Debug/
+BootLoader/Debug
+
+Datalogger/Debug
