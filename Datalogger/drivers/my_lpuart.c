@@ -10,16 +10,54 @@
 #include "my_clock.h"
 #define LPUART_CLOCK CLOCK_getFreq()  // Clock frequency for LPUART
 
-static LPUART_Type *gBase;
+
+static LPUART_CallBackType lpuart0Callback =0;
+static LPUART_CallBackType lpuart1Callback =0;
+static LPUART_CallBackType lpuart2Callback =0;
+static void enableLPUARTClock(LPUART_Type *base)
+{
+    if (base == LPUART0) {
+    	CLOCK_enable(PCC_LPUART0_INDEX);
+    } else if (base == LPUART1) {
+    	CLOCK_enable(PCC_LPUART1_INDEX);
+    } else if (base == LPUART2) {
+    	CLOCK_enable(PCC_LPUART2_INDEX);
+    }
+}
+
+
+// Function to configure the pins for UART operation
+static void setupPinPort(LPUART_Type *base)
+{
+    if (base == LPUART0) {
+        // Enable clock for PORTB
+        PCC->CLKCFG[PCC_PORTB_INDEX] |= PCC_CLKCFG_CGC(1);
+        PORTB->PCR[0] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART0 RX
+        PORTB->PCR[1] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART0 TX
+    } else if (base == LPUART1) {
+        // Enable clock for PORTC
+        PCC->CLKCFG[PCC_PORTC_INDEX] |= PCC_CLKCFG_CGC(1);
+        PORTC->PCR[6] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART1 RX
+        PORTC->PCR[7] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART1 TX
+    } else if (base == LPUART2) {
+        // Enable clock for PORTD
+        PCC->CLKCFG[PCC_PORTD_INDEX] |= PCC_CLKCFG_CGC(1);
+        PORTD->PCR[6] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART2 RX
+        PORTD->PCR[7] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART2 TX
+    } else {
+        // error
+    }
+}
+
+
 void LPUART_begin(LPUART_Type *base, uint32_t baudRate)
 {
-    gBase = base;
 
     // Enable clock for the UART peripheral
-    enableLPUARTClock();
+    enableLPUARTClock(base);
 
     // Setup the pin port for UART operation
-    setupPinPort();
+    setupPinPort(base);
 
     // Calculate the baud rate setting
     uint16_t sbr = (uint16_t)((LPUART_CLOCK) / (baudRate * 16));
@@ -55,169 +93,59 @@ void LPUART_begin(LPUART_Type *base, uint32_t baudRate)
     // transmit tie LPUART Control Register (CTRL)
 
 }
-void LPUART_enableInterrupts()
+void LPUART_enableRxInterrupts(LPUART_Type *base,LPUART_CallBackType callback)
 {
 	// Enable both receiver and transmitter interrupts
-	gBase->CTRL |= (LPUART_CTRL_RIE_MASK | LPUART_CTRL_TIE_MASK);
+	base->CTRL |= (LPUART_CTRL_RIE_MASK);
 
-    if(gBase == LPUART0){
+    if(base == LPUART0){
         NVIC_EnableIRQ(LPUART0_IRQn);
-    }else if(gBase == LPUART1){
+        lpuart0Callback = callback;
+    }else if(base == LPUART1){
     	NVIC_EnableIRQ(LPUART1_IRQn);
+    	 lpuart1Callback = callback;
     }else{
     	NVIC_EnableIRQ(LPUART2_IRQn);
+    	lpuart2Callback = callback;
     }
-}
-void LPUART_Callback(){
-	 // Clear RX interrupt flag (RDRF - Receiver Data Register Full)
-	    if (gBase->STAT & LPUART_STAT_RDRF_MASK) {
-	        // Reading from the DATA register will clear the RDRF flag
-	        volatile uint8_t dummy = gBase->DATA;  // Clear the flag by reading DATA
-	    }
-
-	    // Clear TX interrupt flag (TDRE - Transmitter Data Register Empty)
-	    if (gBase->STAT & LPUART_STAT_TDRE_MASK) {
-	        // No action needed to clear TDRE flag, but reading or writing to DATA register will reset it.
-	        // For non-blocking transmit, the flag will clear automatically once the data is shifted out.
-	        volatile uint8_t dummy = gBase->DATA;  // Clear the flag by reading DATA (optional)
-	    }
-}
-void enableLPUARTClock()
-{
-    if (gBase == LPUART0) {
-    	CLOCK_enable(PCC_LPUART0_INDEX);
-    } else if (gBase == LPUART1) {
-    	CLOCK_enable(PCC_LPUART1_INDEX);
-    } else if (gBase == LPUART2) {
-    	CLOCK_enable(PCC_LPUART2_INDEX);
-    }
-}
 
 
-// Function to configure the pins for UART operation
-void setupPinPort()
-{
-    if (gBase == LPUART0) {
-        // Enable clock for PORTB
-        PCC->CLKCFG[PCC_PORTB_INDEX] |= PCC_CLKCFG_CGC(1);
-        PORTB->PCR[0] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART0 RX
-        PORTB->PCR[1] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART0 TX
-    } else if (gBase == LPUART1) {
-        // Enable clock for PORTC
-        PCC->CLKCFG[PCC_PORTC_INDEX] |= PCC_CLKCFG_CGC(1);
-        PORTC->PCR[6] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART1 RX
-        PORTC->PCR[7] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART1 TX
-    } else if (gBase == LPUART2) {
-        // Enable clock for PORTD
-        PCC->CLKCFG[PCC_PORTD_INDEX] |= PCC_CLKCFG_CGC(1);
-        PORTD->PCR[6] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART2 RX
-        PORTD->PCR[7] |= PORT_PCR_MUX(2);  // MUX = ALT2, UART2 TX
-    } else {
-        // error
-    }
 }
 
 
 // Function to send a string via UART
-void LPUART_print(char *data)
+void LPUART_write(LPUART_Type *base,uint8_t data)
 {
-    uint32_t i = 0;
-    while (data[i] != '\0') {
-    	while((gBase->STAT & LPUART_STAT_TDRE_MASK)>>LPUART_STAT_TDRE_SHIFT==0);  // Wait for TX buffer to be empty
-        gBase->DATA = data[i];  // Send character
-        i++;
-    }
+    while((base->STAT & LPUART_STAT_TDRE_MASK)>>LPUART_STAT_TDRE_SHIFT==0);  // Wait for TX buffer to be empty
+    base->DATA = data;  // Send character
+
 }
 
-// Function to send a string followed by a newline
-void LPUART_println(char *data)
-{
-    LPUART_print(data);  // Send the string
-    LPUART_print("\r\n"); // Send newline and carriage return
-}
 // Function to check if data is available to read from UART
-uint8_t LPUART_available()
+uint8_t LPUART_available(LPUART_Type *base)
 {
-    return (gBase->STAT & LPUART_STAT_RDRF_MASK) != 0;  //!=0 can read
+    return (base->STAT & LPUART_STAT_RDRF_MASK) != 0;  //!=0 can read
 }
-// Function to read a string from UART
-char *LPUART_readString(uint32_t size)
+
+uint8_t LPUART_readByte(LPUART_Type *base)
 {
-    char *buffer = (char *)malloc(size);
-    if (buffer == NULL) {
-        return NULL; // if memory allocation fails
-    }
-
-    uint32_t i = 0;
-    while (i < size - 1) {
-    	while((gBase->STAT & LPUART_STAT_TDRE_MASK)>>LPUART_STAT_TDRE_SHIFT==0);;//wait data
-        buffer[i] = gBase->DATA;
-        if (buffer[i] == '\n') {
-            break;
-        }
-        i++;
-    }
-    buffer[i] = '\0';
-    return buffer;
-}
-char *LPUART_readUntil(char endChar) {
-    uint32_t bufferSize = 128;
-    char *buffer = (char *)malloc(bufferSize);
-    if (buffer == NULL) {
-        return NULL; // Return NULL if malloc fails
-    }
-
-    uint32_t i = 0;
-
-    // Wait for data to be received and check LPUART available
-    while (1) {
-        // Wait for data if nothing available
-    	while((gBase->STAT & LPUART_STAT_TDRE_MASK)>>LPUART_STAT_TDRE_SHIFT==0);
-
-        char receiveChar = gBase->DATA;
-
-        if (receiveChar == endChar) {
-            break;  // Break the loop when endChar is received
-        }
-
-        // Store the received character into buffer
-        buffer[i++] = receiveChar;
-
-        // Reallocate buffer if it's full
-        if (i >= bufferSize) {
-            bufferSize *= 2; // Double the buffer size
-            char *newBuffer = (char *)realloc(buffer, bufferSize);
-            if (newBuffer == NULL) {
-                free(buffer); // Free the old buffer to avoid memory leak
-                return NULL;  // Return NULL if realloc fails
-            }
-            buffer = newBuffer; // Update buffer to the new memory location
-        }
-    }
-
-    // Null-terminate the string
-    buffer[i] = '\0';
-    return buffer;
-}
-// Function to read multiple bytes from UART
-uint32_t LPUART_readBytes(uint8_t *buffer, uint32_t size)
-{
-    uint32_t bytesRead = 0;
-    while (bytesRead < size) {
-        //while ((gBase->STAT & LPUART_STAT_RDRF_MASK) == 0);  // Wait for data to be received
-        buffer[bytesRead] = gBase->DATA;
-        bytesRead++;
-    }
-    return bytesRead;
+	uint8_t data = base->DATA;
+	return data;
 }
 
 void LPUART0_IRQHandler(void){
-	LPUART_Callback();
+	if(lpuart0Callback != 0){
+		lpuart0Callback();
+	}
 }
 void LPUART1_IRQHandler(void){
-	LPUART_Callback();
+	if(lpuart1Callback != 0){
+			lpuart0Callback();
+		}
 }
 void LPUART2_IRQHandler(void){
-	LPUART_Callback();
+	if(lpuart2Callback != 0){
+			lpuart0Callback();
+		}
 }
 

@@ -4,25 +4,25 @@
 #include "led_service.h"
 #include "sensor_service.h"
 #include "timer.h"
-#include "my_lpuart.h"
+#include "serial.h"
 
 #define MAX_JSON_SIZE 100
-#define LPUART_BASE LPUART2
+#define LPUART_BASE LPUART0
 #define BAUDRATE 4800
 
-
+char * data;
 int8_t values[2] = {0};
 char* msg;
 void sendMsg(){
 	 snprintf(msg, MAX_JSON_SIZE, "%d,%d\n", values[0], values[1]);
-    LPUART_println(msg);
+	 Serial_println(LPUART0,msg);
 }
 int main(void)
 {
 	msg = (char*)malloc(MAX_JSON_SIZE);
 
-	LPUART_begin(LPUART_BASE,BAUDRATE);
-	LPUART_println("MSG starting ..");
+	Serial_begin(LPUART0, 4800);
+	Serial_println(LPUART0,"MSG starting ..");
 
 	TEMP_init();
 	LED_init(LED_MODE_1);
@@ -31,9 +31,19 @@ int main(void)
 
 
     while (1) {
-    	LED_start();
+    	LED_loop();
     	values[0] = (int8_t)TEMP_getAvrValue(); // temperature
         values[1] = LED_getMode(); // mode
+
+        if(Serial_available(LPUART0,4)){
+        	 data = Serial_readBytes(LPUART0);
+        	 if(strcmp(data, "ffff") == 0){
+        		 Serial_println(LPUART0,"Reset Chip !");
+        		 NVIC_SystemReset();
+        	 }else{
+            	 Serial_println(LPUART0,"ERROR");
+        	 }
+        }
 
     }
     free(msg);

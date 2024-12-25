@@ -18,20 +18,13 @@
 #include "MKE16Z4.h"
 #include <stdint.h>
 #include <stdlib.h>
-// Function prototypes
-void LPUART_Callback();
+
+typedef void (*LPUART_CallBackType)(void);
+
 void LPUART_begin(LPUART_Type *base, uint32_t baudRate);
-void LPUART_enableInterrupts();
-void LPUART_print(char *data);
-void LPUART_println(char *data);
-
-uint8_t LPUART_available();
-char *LPUART_readString(uint32_t size);
-char *LPUART_readUntil(char endChar);
-uint32_t LPUART_readBytes(uint8_t *buffer, uint32_t size);
-
-void enableLPUARTClock(void);
-// Configure the pins for UART operation (TX and RX pins)
-void setupPinPort(void);
+void LPUART_enableRxInterrupts(LPUART_Type *base, LPUART_CallBackType callback);
+void LPUART_write(LPUART_Type *base, uint8_t data);
+uint8_t LPUART_available(LPUART_Type *base);
+uint8_t LPUART_readByte(LPUART_Type *base);
 
 #endif /* MY_UART_H_ */

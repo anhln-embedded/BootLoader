@@ -6,22 +6,32 @@
  */
 
 #include "led_service.h"
-#define NUM_MODE 2
+#define NUM_MODE 4
 #define MAX_COUNT UINT32_MAX
 
 volatile uint8_t g_mutexFlag = 0; // 0: unlocked, 1: locked
 volatile uint32_t g_systickCounter;
 volatile uint8_t mode = LED_MODE_1;
-void toggleMode(){
-	mode = (mode+1)%NUM_MODE;
-	turnOffAll();
-}
+/*==========*/
+static void mode0(void);
+static void mode1(void);
+static void mode2(void);
+static void mode3(void);
+static void turnOffAll(void);
+static void initGPIO(void);
+static void enableClock(void);
+static void toggleMode();
+
+
+
 LED_Mode LED_getMode(){
 	return mode;
 }
 void LED_init(LED_Mode modeDefault){
 	enableClock();
 	initGPIO();
+	turnOffAll();
+	mode0();
 	// init sys tick
 	if (SysTick_Config(SystemCoreClock / 1000U))
 	{
@@ -29,23 +39,98 @@ void LED_init(LED_Mode modeDefault){
 	}
 	mode = modeDefault;
 }
-void LED_start()
+
+void LED_loop()
 {
     switch (mode)
     {
-    case LED_MODE_1: // Mode 1
+    case LED_MODE_0: // Mode 1
+        mode0();
+        break;
+    case LED_MODE_1: // Mode 2
         mode1();
         break;
-    case LED_MODE_2: // Mode 2
-        mode2();
-        break;
+    case LED_MODE_2: // Mode 1
+         mode2();
+         break;
+    case LED_MODE_3: // Mode 2
+         mode3();
+         break;
     default:
         break;
     }
 }
 
+void buttonCallback(PORT_Type *port, uint8_t pin){
+	if(port == SW_PORT && pin == SW_PIN){
+		toggleMode();
+		}
 
-void mode1()
+}
+
+
+/* SysTick Handler */
+void SysTick_Handler(void)
+{
+	g_systickCounter++;
+	if (g_systickCounter >= MAX_COUNT){
+	        g_systickCounter = 0;
+	 }
+}
+
+uint32_t millis(void)
+{
+
+    return g_systickCounter;
+}
+
+static void initGPIO() {
+    // Pin Configuration for LEDs
+	PortConfig_t ledPinConfig = {PORT_MUX_GPIO, PORT_PULL_DISABLE, PORT_INTERRUPT_DISABLE, NULL};
+	GPIOConfig_t ledConfig = {&ledPinConfig,OUTPUT, GPIO_HIGH};
+
+    // Green LED configuration
+    GPIO_Init(LED_PORT,gLED_PIN,&ledConfig);
+
+    // Red LED configuration (using same PinConfig and GPIOConfig as Green LED)
+    GPIO_Init(LED_PORT,rLED_PIN,&ledConfig);
+
+    // Blue LED configuration (using same PinConfig and GPIOConfig as Green LED)
+    GPIO_Init(bLED_PORT, bLED_PIN, &ledConfig);
+
+    // Button (SW) configuration
+    PortConfig_t buttonPinConfig = {PORT_MUX_GPIO, PORT_PULL_UP, PORT_INTERRUPT_FALLING, buttonCallback};
+    GPIOConfig_t buttonConfig = {&buttonPinConfig,INPUT,GPIO_HIGH};
+    GPIO_Init(SW_PORT,SW_PIN,&buttonConfig);
+}
+
+static void toggleMode(){
+	mode = (mode+1)%NUM_MODE;
+	turnOffAll();
+}
+static void mode0(){
+
+	 static uint32_t previousMillis = 0;
+	    static uint8_t ledState = 0;
+	    uint32_t currentMillis = millis();
+
+	    if ((currentMillis - previousMillis) >= 100)
+	    {
+	        previousMillis = currentMillis;
+	        ledState = !ledState;           // toggle
+
+	        if (ledState)
+	        {
+	        	GPIO_WritePin(bLED_GPIO, bLED_PIN, GPIO_LOW);  // Green LED ON
+	        }
+	        else
+	        {
+	        	GPIO_WritePin(bLED_GPIO, bLED_PIN, GPIO_HIGH);  // Green LED ON
+	        }
+	    }
+
+}
+static void mode1()
 {
 //    GPIO_WritePin(LED_GPIO, gLED_PIN, GPIO_LOW);  // Green LED ON
 //    GPIO_WritePin(LED_GPIO, rLED_PIN, GPIO_LOW);  // Red LED ON
@@ -54,7 +139,7 @@ void mode1()
     static uint8_t ledState = 0;
     uint32_t currentMillis = millis();
 
-    if ((currentMillis - previousMillis) >= 200)
+    if ((currentMillis - previousMillis) >= 1000)
     {
         previousMillis = currentMillis;
         ledState = !ledState;           // toggle
@@ -72,7 +157,7 @@ void mode1()
     }
 }
 
-void mode2(){
+static void mode2(){
 //    GPIO_WritePin(LED_GPIO, gLED_PIN, GPIO_LOW); // Green LED ON
 //    GPIO_WritePin(LED_GPIO, rLED_PIN, GPIO_HIGH);  // Red LED OFF
 
@@ -98,64 +183,20 @@ void mode2(){
     }
 
 }
-void mode3(void){
+static void mode3(void){
 	turnOffAll();
 }
 
-void turnOffAll(){
+static void turnOffAll(){
 	  GPIO_WritePin(LED_GPIO, gLED_PIN, GPIO_HIGH);  // Green LED OFF
 	  GPIO_WritePin(LED_GPIO, rLED_PIN, GPIO_HIGH);   // Red LED OFF
-	  GPIO_WritePin(bLED_PORT, bLED_PIN, GPIO_HIGH);   // Blue LED OFF
+	  GPIO_WritePin(bLED_GPIO, bLED_PIN, GPIO_HIGH);   // Blue LED OFF
 
 }
-void initGPIO(){
-	/* LED configuration (Green, Red, Blue)*/
-	PortConfig_t ledPortConfig = {LED_PORT, gLED_PIN, PULL_DISABLE, ISF_DISABLED};
-	GPIOConfig_t ledConfig = {LED_GPIO, OUTPUT, GPIO_HIGH, NULL};
 
-	PortConfig_t redLedPortConfig = {LED_PORT, rLED_PIN, PULL_DISABLE, ISF_DISABLED};
-	GPIOConfig_t redLedConfig = {LED_GPIO, OUTPUT, GPIO_HIGH, NULL};
 
-	PortConfig_t blueLedPortConfig = {bLED_PORT, bLED_PIN, PULL_DISABLE, ISF_DISABLED};
-	GPIOConfig_t blueLedConfig = {bLED_PORT, OUTPUT, GPIO_HIGH, NULL};
-
-	/* Initialize GPIO for LEDs*/
-	GPIO_Init(&ledPortConfig, &ledConfig);
-	GPIO_Init(&redLedPortConfig, &redLedConfig);
-	GPIO_Init(&blueLedPortConfig, &blueLedConfig);
-
-	/* Button (SW) configuration*/
-	PortConfig_t swPortConfig = {SW_PORT, SW_PIN, PULL_UP, ISF_FALLING_EDGE};
-	GPIOConfig_t swConfig = {SW_GPIO, INPUT, GPIO_HIGH, buttonCallback};
-
-	/* Initialize GPIO for button*/
-	GPIO_Init(&swPortConfig, &swConfig);
-
-}
-void enableClock(void){
+static void enableClock(void){
 	PCC->CLKCFG[PCC_PORTB_INDEX] |= PCC_CLKCFG_CGC(1); /*enable port B for Button*/
 	PCC->CLKCFG[PCC_PORTD_INDEX] |= PCC_CLKCFG_CGC(1); /*enable port D for RGB LED*/
 }
 
-void buttonCallback(PORT_Type *port, uint8_t pin){
-	if(port == SW_PORT && pin == SW_PIN){
-		toggleMode();
-		}
-
-}
-
-
-/* SysTick Handler */
-void SysTick_Handler(void)
-{
-	g_systickCounter++;
-	if (g_systickCounter >= MAX_COUNT){
-	        g_systickCounter = 0;
-	 }
-}
-
-uint32_t millis(void)
-{
-
-    return g_systickCounter;
-}
