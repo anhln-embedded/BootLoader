@@ -8,11 +8,19 @@
 #include "MKE16Z4.h"
 #include "bootloader.h"
 
+void delay(){
+	for(int i = 0; i < 10000; i++){
+
+	}
+}
+
+
 
 int main()
 {
 	BootInit();
-//	FLASH_Erase(APPLICATION_ADRESS_1);
+	delay();
+//	BootJumpToApplication(0x5000);
     while (1)
     {
     	BootFirmwareUpdate();

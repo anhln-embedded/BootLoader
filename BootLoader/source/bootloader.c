@@ -7,8 +7,9 @@
 
 #include "bootloader.h"
 
+
 LPUART_InitStruct_t LPUART_InitStruct = {
-    .BaudRate = 4800,
+    .BaudRate = 9600,
     .NumberData = 8,
     .ParityConfig = LPUART_PARITY_NONE,
     .MSB_First = 0,
@@ -35,7 +36,7 @@ uint8_t Flash_SrecLine(SrecLine_t *Data)
     uint32_t dataFlash = 0;
     for (int i = 0; i < (Data->u8ByteCount - 4); i += 4)
     {
-        dataFlash = (Data->pData[i] << 24) | (Data->pData[i + 1] << 16) | (Data->pData[i + 2] << 8) | Data->pData[i + 3];
+        dataFlash = (Data->pData[i + 3] << 24) | (Data->pData[i + 2] << 16) | (Data->pData[i + 1] << 8) | Data->pData[i];
         FLASH_Write(Data->u32Address + i, dataFlash);
     }
     return 1;
@@ -61,6 +62,15 @@ void Serial_Printf(char *format, ...)
     }
 }
 
+uint8_t var_test1 = 0;
+uint8_t var_test2 = 0;
+uint8_t var_test3 = 0;
+uint8_t var_test4 = 0;
+
+
+uint8_t BOOT_MODE;
+
+
 void BootInit(void)
 {
     __enable_irq();
@@ -70,7 +80,11 @@ void BootInit(void)
     PORT_Pin_Init(PORT_INS_B, 1, &config);
     UART_Init(LPUART0, &LPUART_InitStruct);
     UART_RegisterHandler(LPUART0, UART_ISR);
+    Serial_Printf("address: 0x%08x\n", &BOOT_MODE);
+
 }
+
+
 
 void BootJumpToApplication(uint32_t address)
 {
@@ -82,7 +96,9 @@ void BootJumpToApplication(uint32_t address)
     /* Set the PC to the application reset vector */
     void (*app_reset_handler)(void) = (void (*)(void))(*(uint32_t *)(address + 4));
     app_reset_handler();
+
 }
+
 void BootFirmwareUpdate(void)
 {
     uint8_t charSrec;
@@ -92,11 +108,10 @@ void BootFirmwareUpdate(void)
         line[lineIndex] = charSrec;
         if (charSrec == '\n')
         {
-        	lineIndex++;
-        	line[lineIndex] = 0;
+            lineIndex++;
+            line[lineIndex] = 0;
             if (SrecReadLine((char *)line, &Data) == SREC_ERROR_NOERR)
             {
-            	Serial_Printf("%s\n", line);
                 if (Data.u8SrecType == 0)
                 {
                     Serial_Printf("Boot Start\n");
@@ -104,7 +119,7 @@ void BootFirmwareUpdate(void)
                 else if (Data.u8SrecType == 9)
                 {
                     Serial_Printf("Boot End\n");
-                    //                   BootJumpToApplication(Data.u32Address);
+                    BootJumpToApplication(APPLICATION_ADRESS_1);
                 }
                 else
                 {
@@ -112,7 +127,7 @@ void BootFirmwareUpdate(void)
                     if (*(uint32_t *)(Data.u32Address) != 0xFFFFFFFF)
                     {
                         Serial_Printf("Erase\n");
-                        FLASH_Erase(Data.u32Address);
+                        // FLASH_Erase(Data.u32Address);
                     }
                     Flash_SrecLine(&Data);
                 }

@@ -9,7 +9,7 @@ GROUP (
 MEMORY
 {
   /* Define each memory region */
-  PROGRAM_FLASH (rx) : ORIGIN = 0x5000, LENGTH = 0x10000 /* 64K bytes (alias Flash) */  
+  PROGRAM_FLASH (rx) : ORIGIN = 0x0, LENGTH = 0x10000 /* 64K bytes (alias Flash) */  
   SRAM (rwx) : ORIGIN = 0x1ffff800, LENGTH = 0x2000 /* 8K bytes (alias RAM) */  
 }
 
@@ -28,8 +28,7 @@ ENTRY(ResetISR)
 
 SECTIONS
 {
-	
-    /* Shared Memory Section */
+	    /* Shared Memory Section */
     .share_memory (NOLOAD) : ALIGN(4)
     {
         __share_memory_start__ = .; /* Start address of the shared memory */
@@ -37,8 +36,7 @@ SECTIONS
         . = ALIGN(4);
         __share_memory_end__ = .;   /* End address of the shared memory */
     } > SRAM
-    
-    
+	
      /* MAIN TEXT SECTION */
     .text : ALIGN(4)
     {
@@ -62,7 +60,13 @@ SECTIONS
 
         *(.after_vectors*)
 
-
+        /* Kinetis Flash Configuration data */
+        . = 0x400 ;
+        PROVIDE(__FLASH_CONFIG_START__ = .) ;
+        KEEP(*(.FlashConfig))
+        PROVIDE(__FLASH_CONFIG_END__ = .) ;
+        ASSERT(!(__FLASH_CONFIG_START__ == __FLASH_CONFIG_END__), "Linker Flash Config Support Enabled, but no .FlashConfig section provided within application");
+        /* End of Kinetis Flash Configuration data */
         
        *(.text*)
        *(.rodata .rodata.* .constdata .constdata.*)
@@ -133,8 +137,6 @@ SECTIONS
         PROVIDE(__end_bss_SRAM = .) ;
         PROVIDE(end = .);
     } > SRAM AT> SRAM
-
-
 
     /* DEFAULT NOINIT SECTION */
     .noinit (NOLOAD): ALIGN(4)
