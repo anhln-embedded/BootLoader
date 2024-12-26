@@ -11,7 +11,7 @@
 #define LPUART_BASE LPUART0
 #define BAUDRATE 4800
 
-BOOT_MODE_t BOOT_MODE;
+__attribute__((section(".share_memory"))) uint32_t BOOT_MODE;
 
 char * data;
 int8_t values[2] = {0};
@@ -24,7 +24,7 @@ int main(void)
 {
 	msg = (char*)malloc(MAX_JSON_SIZE);
 
-	Serial_begin(LPUART0, 4800);
+	Serial_begin(LPUART0, 9600);
 	Serial_println(LPUART0,"MSG starting ..");
 
 	TEMP_init();
@@ -42,7 +42,7 @@ int main(void)
         	 data = Serial_readBytes(LPUART0);
         	 if(strcmp(data, "ffff") == 0){
         		 Serial_println(LPUART0,"Reset Chip !");
-        		 BOOT_MODE = BOOT_MODE_UPDATE_FIRM_WARE;
+        		 BOOT_MODE = 0xAAAAAAAA;
         		 NVIC_SystemReset();
         	 }else{
             	 Serial_println(LPUART0,"ERROR");

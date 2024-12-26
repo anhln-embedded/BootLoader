@@ -22,10 +22,18 @@
 #include "share_memory.h"
 
 
-#define APPLICATION_ADRESS_1 0x5000
+#define APPLICATION_ADDRESS_1 0x5000
+
+typedef enum {
+    BOOT_JUMPTO_APP_SUCCESS,
+    BOOT_JUMPTO_APP_FAIL,
+    UPDATE_SUCCESS,
+    UPDATE_FAIL,
+}Boot_status_t;
 
 void BootInit(void);
+void BootRun(void);
 void BootJumpToApplication(uint32_t address);
-void BootFirmwareUpdate(void);
+Boot_status_t BootFirmwareUpdate(uint32_t address);
 
 #endif /* BOOTLOADER_H_ */
