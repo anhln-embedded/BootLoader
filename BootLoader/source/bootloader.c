@@ -7,6 +7,7 @@
 
 #include "bootloader.h"
 
+BOOT_MODE_t BOOT_MODE;
 
 LPUART_InitStruct_t LPUART_InitStruct = {
     .BaudRate = 9600,
@@ -67,10 +68,6 @@ uint8_t var_test2 = 0;
 uint8_t var_test3 = 0;
 uint8_t var_test4 = 0;
 
-
-uint8_t BOOT_MODE;
-
-
 void BootInit(void)
 {
     __enable_irq();
@@ -81,10 +78,7 @@ void BootInit(void)
     UART_Init(LPUART0, &LPUART_InitStruct);
     UART_RegisterHandler(LPUART0, UART_ISR);
     Serial_Printf("address: 0x%08x\n", &BOOT_MODE);
-
 }
-
-
 
 void BootJumpToApplication(uint32_t address)
 {
@@ -96,7 +90,6 @@ void BootJumpToApplication(uint32_t address)
     /* Set the PC to the application reset vector */
     void (*app_reset_handler)(void) = (void (*)(void))(*(uint32_t *)(address + 4));
     app_reset_handler();
-
 }
 
 void BootFirmwareUpdate(void)

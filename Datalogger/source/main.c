@@ -5,10 +5,13 @@
 #include "sensor_service.h"
 #include "timer.h"
 #include "serial.h"
+#include "share_memory.h"
 
 #define MAX_JSON_SIZE 100
 #define LPUART_BASE LPUART0
 #define BAUDRATE 4800
+
+BOOT_MODE_t BOOT_MODE;
 
 char * data;
 int8_t values[2] = {0};
@@ -39,6 +42,7 @@ int main(void)
         	 data = Serial_readBytes(LPUART0);
         	 if(strcmp(data, "ffff") == 0){
         		 Serial_println(LPUART0,"Reset Chip !");
+        		 BOOT_MODE = BOOT_MODE_UPDATE_FIRM_WARE;
         		 NVIC_SystemReset();
         	 }else{
             	 Serial_println(LPUART0,"ERROR");
