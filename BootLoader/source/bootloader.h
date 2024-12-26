@@ -19,6 +19,7 @@
 #include "clock.h"
 #include "port.h"
 #include "circular_queue.h"
+#include "share_memory.h"
 
 
 #define APPLICATION_ADRESS_1 0x5000

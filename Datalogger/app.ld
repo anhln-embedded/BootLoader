@@ -28,6 +28,17 @@ ENTRY(ResetISR)
 
 SECTIONS
 {
+	
+    /* Shared Memory Section */
+    .share_memory (NOLOAD) : ALIGN(4)
+    {
+        __share_memory_start__ = .; /* Start address of the shared memory */
+        KEEP(*(.share_memory*));    /* Keep all symbols in .share_memory */
+        . = ALIGN(4);
+        __share_memory_end__ = .;   /* End address of the shared memory */
+    } > SRAM
+    
+    
      /* MAIN TEXT SECTION */
     .text : ALIGN(4)
     {
@@ -122,6 +133,8 @@ SECTIONS
         PROVIDE(__end_bss_SRAM = .) ;
         PROVIDE(end = .);
     } > SRAM AT> SRAM
+
+
 
     /* DEFAULT NOINIT SECTION */
     .noinit (NOLOAD): ALIGN(4)
