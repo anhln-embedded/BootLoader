@@ -148,4 +148,3 @@ void LPUART2_IRQHandler(void){
 			lpuart0Callback();
 		}
 }
-

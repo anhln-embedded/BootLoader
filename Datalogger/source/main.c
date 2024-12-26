@@ -26,7 +26,7 @@ int main(void)
 
 	TEMP_init();
 	LED_init(LED_MODE_1);
-	TIMER_init(10000);
+	TIMER_init(5000);
 	TIMER_setCallback(sendMsg);
 
 

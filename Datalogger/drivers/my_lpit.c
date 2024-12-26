@@ -53,7 +53,7 @@ void LPIT_delay(uint32_t microSecond){
 	 * reload = [0.2]*1000000+1 = 200 001
 	 */
 	LPIT0->CHANNEL[gChannel].TCTRL &= ~LPIT_TCTRL_MODE_MASK;
-	LPIT0->CHANNEL[gChannel].TVAL = USEC_TO_COUNT(microSecond,f)*2000 +1;
+	LPIT0->CHANNEL[gChannel].TVAL = USEC_TO_COUNT(microSecond,f)*2000;
 
 
 }

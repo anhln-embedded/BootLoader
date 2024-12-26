@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "my_lpuart.h"
+#include "my_circular_queue.h"
+#include "my_clock.h"
 void UART_ISR(void);
 void Serial_begin(LPUART_Type *base, uint32_t baudRate);
 void Serial_print(LPUART_Type *base, char *message);
