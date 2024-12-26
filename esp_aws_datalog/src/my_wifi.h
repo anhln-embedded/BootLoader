@@ -1,7 +1,6 @@
 #ifndef MY_WIFI_H_
 #define MY_WIFI_H_
 #include <Arduino.h>
-#include <FS.h> 
 #include <ESP8266WiFi.h>
 #include <EEPROM.h>
 #include <ESP8266WebServer.h>

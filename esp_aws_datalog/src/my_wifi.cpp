@@ -1,4 +1,5 @@
 #include "my_wifi.h"
+#include <LittleFS.h> // Thay thế SPIFFS bằng LittleFS
 
 #define EEPROM_SIZE 64
 #define SSID_ADDRESS 0
@@ -10,13 +11,15 @@ MYWIFI::MYWIFI() : server(80)
     server.on("/", HTTP_GET, std::bind(&MYWIFI::handleRoot, this));          // Serve the HTML page
     server.on("/save", HTTP_POST, std::bind(&MYWIFI::handleSaveWiFi, this)); // Save WiFi credentials
 }
-bool MYWIFI ::isConnected()
+
+bool MYWIFI::isConnected()
 {
     return WiFi.isConnected();
 }
+
 String MYWIFI::readSSID()
 {
-    char ssid[32];
+    char ssid[32] = {0};
     for (int i = 0; i < 32; i++)
     {
         ssid[i] = EEPROM.read(SSID_ADDRESS + i);
@@ -26,7 +29,7 @@ String MYWIFI::readSSID()
 
 String MYWIFI::readPassword()
 {
-    char password[32];
+    char password[32] = {0};
     for (int i = 0; i < 32; i++)
     {
         password[i] = EEPROM.read(PASSWORD_ADDRESS + i);
@@ -52,17 +55,19 @@ bool MYWIFI::connect(uint32_t timeLimit)
     // if (ssid.length() > 0 && password.length() > 0)
     // {
     //     WiFi.begin(ssid.c_str(), password.c_str());
-    // }else{
-    //     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);        
     // }
-    Serial.println("Connecting to WiFi");
-    
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD); 
-    while (WiFi.status() != WL_CONNECTED)
+    // else
+    // {
+    //     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    // }
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    unsigned long startTime = millis();
+    while (WiFi.status() != WL_CONNECTED && (millis() - startTime) < timeLimit)
     {
-        delay(500);
-        Serial.print('.');
+        delay(50);
+        yield(); // Đảm bảo tránh reset Watchdog
     }
+    
     return WiFi.isConnected();
 }
 
@@ -84,10 +89,10 @@ void MYWIFI::startAP()
     Serial.print("AP IP Address: ");
     Serial.println(WiFi.softAPIP());
 
-    // Initialize SPIFFS
-    if (!SPIFFS.begin())
+    // Initialize LittleFS
+    if (!LittleFS.begin())
     {
-        Serial.println("SPIFFS mount failed!");
+        Serial.println("LittleFS mount failed!");
         return;
     }
 }
@@ -97,9 +102,10 @@ void MYWIFI::stopAP()
     WiFi.softAPdisconnect(true);
     Serial.println("Access Point stopped.");
 }
+
 void MYWIFI::handleRoot()
 {
-    File file = SPIFFS.open("/index.html", "r");
+    File file = LittleFS.open("/index.html", "r");
     if (file)
     {
         server.streamFile(file, "text/html");
@@ -121,7 +127,7 @@ void MYWIFI::handleSaveWiFi()
         saveWiFiCredentials(ssid, password);
         server.send(200, "text/html", "<h1>WiFi Saved! Restarting...</h1>");
         delay(2000);
-        ESP.restart(); // Restart ESP after saving credentials
+        ESP.restart();
     }
     else
     {
@@ -129,24 +135,48 @@ void MYWIFI::handleSaveWiFi()
     }
 }
 
-void MYWIFI ::loop()
+void MYWIFI::loop()
 {
-    if (!isConnected()) // wifi not available
-    {
-        if (WiFi.softAPgetStationNum() == 0)
-        {
-            startAP();
-            server.begin(); // Start the web server
-            Serial.println("Web server started.");
-        }
-        server.handleClient();
-    }
-    else
-    {
-        if (WiFi.softAPgetStationNum() > 0)
-        {
-            stopAP();
-            server.stop();
-        }
-    }
+    // static unsigned long disconnectStartTime = 0;
+    // static bool apStarted = false;
+
+    // if (!isConnected())
+    // {
+    //     if (disconnectStartTime == 0)
+    //     {
+    //         disconnectStartTime = millis();
+    //     }
+
+    //     unsigned long elapsedTime = millis() - disconnectStartTime;
+
+    //     if (elapsedTime > 60000 && !apStarted)
+    //     {
+    //         Serial.println("WiFi disconnected for 30 seconds. Starting Access Point...");
+    //         startAP();
+    //         server.begin();
+    //         apStarted = true;
+    //     }
+    //     else if (elapsedTime <= 60000)
+    //     {
+    //         Serial.print(".");
+    //         delay(50);
+    //         yield(); // Tránh Watchdog Reset
+    //     }
+    // }
+    // else
+    // {
+    //     if (apStarted)
+    //     {
+    //         Serial.println("WiFi connected. Stopping AP and server.");
+    //         stopAP();
+    //         server.stop();
+    //         apStarted = false;
+    //     }
+    //     disconnectStartTime = 0;
+    // }
+
+    // if (apStarted)
+    // {
+    //     server.handleClient();
+    // }
 }

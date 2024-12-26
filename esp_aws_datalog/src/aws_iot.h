@@ -12,12 +12,12 @@ void messageReceived(char* topic, byte* payload, unsigned int length);
 
 class AWSIoT {
 public:
+
     AWSIoT(); 
     void begin();  
     void loop();  
-    void publishMessage(char * msg); 
-    void subscribeToTopic(const char* topic);  
-    void setCallback();  
+    void publishMessage(const char * topic,char * msg); 
+    void subscribeToTopic(const char* topic, void (*_mqttcallback)(char*, uint8_t*, unsigned int));
 
 private:
 
