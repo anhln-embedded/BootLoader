@@ -4,7 +4,10 @@
 #include <stdint.h>
 #include "my_adc.h"
 #include "my_lpit.h"
+<<<<<<< HEAD
 #include "float.h"
+=======
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a
 #define ADC_TEMP_CHANNEL 26
 #define ADC_CHANNEL 0
 

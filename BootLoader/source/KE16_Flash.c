@@ -15,7 +15,10 @@
 void FLASH_Write(uint32_t Address, uint32_t Data)
 {
     /* Wait Previous Command Complete? */
+<<<<<<< HEAD
 	__disable_irq();
+=======
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a
     while ((FTFA->FSTAT & FTFA_FSTAT_CCIF_MASK) == 0);
 
     /* Check Error from Previous Command */
@@ -39,9 +42,18 @@ void FLASH_Write(uint32_t Address, uint32_t Data)
     FTFA->FCCOB7 = (uint8_t) (Data);
 
     /*clear CCIF Flag to launch command */
+<<<<<<< HEAD
     FTFA->FSTAT = START_COMMAND;
     while ((FTFA->FSTAT & FTFA_FSTAT_CCIF_MASK) == 0);
     __enable_irq();
+=======
+//    FTFA->FSTAT = START_COMMAND;
+	/* Start command and wait for it to complete */
+	__disable_irq();
+	FTFA->FSTAT |= FTFA_FSTAT_CCIF(1U);
+	while((FTFA->FSTAT & FTFA_FSTAT_CCIF_MASK) == 0);
+	__enable_irq();
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a
 }
 
 void FLASH_Erase(uint32_t Address)
@@ -52,7 +64,10 @@ void FLASH_Erase(uint32_t Address)
 	}
 
    /* wait previous command complate*/
+<<<<<<< HEAD
   __disable_irq();
+=======
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a
   while ((FTFA->FSTAT & FTFA_FSTAT_CCIF_MASK) == 0);
 
   /*write command and parameter to FCCOB0*/
@@ -63,9 +78,19 @@ void FLASH_Erase(uint32_t Address)
   FTFA->FCCOB3 = (uint8_t) (Address);
 
   //clear Clear CCIF;
+<<<<<<< HEAD
   FTFA->FSTAT = START_COMMAND;
   while ((FTFA->FSTAT & FTFA_FSTAT_CCIF_MASK) == 0);
   __enable_irq();
+=======
+  //FTFA->FSTAT = START_COMMAND;
+	/* Start command and wait for it to complete */
+	__disable_irq();
+	FTFA->FSTAT |= FTFA_FSTAT_CCIF(1U);
+	while((FTFA->FSTAT & FTFA_FSTAT_CCIF_MASK) == 0);
+	__enable_irq();
+
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a
 }
 
 void Flash_EraseSector(uint32_t SectorNum)
@@ -76,7 +101,11 @@ void Flash_EraseSector(uint32_t SectorNum)
 	}
 
 	uint32_t Address = SectorNum * 1024;
+<<<<<<< HEAD
 	FLASH_Erase(Address);
+=======
+	Flash_Erase(Address);
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a
 }
 
 uint32_t Flash_Read(uint32_t Address)

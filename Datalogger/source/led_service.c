@@ -44,6 +44,12 @@ void LED_loop()
 {
     switch (mode)
     {
+<<<<<<< HEAD
+=======
+    case LED_MODE_0: // Mode 1
+        mode0();
+        break;
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a
     case LED_MODE_1: // Mode 2
         mode1();
         break;

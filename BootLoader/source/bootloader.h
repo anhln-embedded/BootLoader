@@ -19,6 +19,7 @@
 #include "clock.h"
 #include "port.h"
 #include "circular_queue.h"
+<<<<<<< HEAD
 #include "share_memory.h"
 
 
@@ -35,5 +36,14 @@ void BootInit(void);
 void BootRun(void);
 void BootJumpToApplication(uint32_t address);
 Boot_status_t BootFirmwareUpdate(uint32_t address);
+=======
+
+
+#define APPLICATION_ADRESS_1 0x5000
+
+void BootInit(void);
+void BootJumpToApplication(uint32_t address);
+void BootFirmwareUpdate(void);
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a
 
 #endif /* BOOTLOADER_H_ */

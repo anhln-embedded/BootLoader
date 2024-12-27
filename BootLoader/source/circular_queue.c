@@ -50,6 +50,7 @@ void CircularQueue_GetLine(CircularQueue_t *queue, uint8_t *line){
         }
     }
     line[i] = '\0';
+<<<<<<< HEAD
 }
 void CopyQueue(CircularQueue_t *srcQueue, CircularQueue_t *destQueue)
 {
@@ -60,3 +61,6 @@ void CopyQueue(CircularQueue_t *srcQueue, CircularQueue_t *destQueue)
         CircularQueue_Enqueue(destQueue, data);
     }
 }
+=======
+}
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a

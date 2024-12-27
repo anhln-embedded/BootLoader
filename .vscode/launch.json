@@ -8,8 +8,13 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
+<<<<<<< HEAD
       "cwd": "e:/final_project/final2/esp_aws_datalog/src",
       "program": "e:/final_project/final2/esp_aws_datalog/src/build/Debug/outDebug",
+=======
+      "cwd": "e:/IoT/aws_ke16_project/esp_aws_datalog/src",
+      "program": "e:/IoT/aws_ke16_project/esp_aws_datalog/src/build/Debug/outDebug",
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

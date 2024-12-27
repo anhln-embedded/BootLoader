@@ -18,5 +18,10 @@ bool CircularQueue_Dequeue(CircularQueue_t *queue, uint8_t *data);
 void CircularQueue_Free(CircularQueue_t *queue);
 uint16_t CircularQueue_Size(CircularQueue_t *queue);
 void CircularQueue_GetLine(CircularQueue_t *queue, uint8_t *line);
+<<<<<<< HEAD
 void CopyQueue(CircularQueue_t *srcQueue, CircularQueue_t *destQueue);
 #endif
+=======
+
+#endif
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a

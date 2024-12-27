@@ -43,7 +43,10 @@ static uint8_t StringtoHex(const char *str, int length, uint32_t *result);
 /**
  * Parse a single S-record line.
  */
+<<<<<<< HEAD
 
+=======
+>>>>>>> af3e224ceb77975899ef88e1c09f43064e1b440a
 ErrorCode_t SrecReadLine(char *line, SrecLine_t *Data)
 {
     uint32_t idx = 0;
