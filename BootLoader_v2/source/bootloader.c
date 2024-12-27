@@ -9,7 +9,6 @@
 
 __attribute__((section(".share_memory"))) uint32_t BOOT_MODE;
 
-uint32_t BOOT_MODE
 
 LPUART_InitStruct_t LPUART_InitStruct = {
     .BaudRate = 9600,
@@ -43,11 +42,11 @@ void BootInit(void)
 {
     __enable_irq();
     /* Enable clock for PORTB */
-    EnableClockForPort(PCC_PORTB_INDEX);
-    PORT_Pin_Init(PORT_INS_B, 0, &config);
-    PORT_Pin_Init(PORT_INS_B, 1, &config);
-    UART_Init(LPUART0, &LPUART_InitStruct);
-    UART_RegisterHandler(LPUART0, UART_ISR);
+    EnableClockForPort(PCC_PORTD_INDEX);
+    PORT_Pin_Init(PORT_INS_D, 6, &config);
+    PORT_Pin_Init(PORT_INS_D, 7, &config);
+    UART_Init(LPUART2, &LPUART_InitStruct);
+    UART_RegisterHandler(LPUART2, UART_ISR);
     Serial_Printf("address: 0x%08x\n", &BOOT_MODE);
 }
 
@@ -185,7 +184,7 @@ static void Erase_Application(uint32_t address)
 static void UART_ISR(void)
 {
     char data;
-    UART_ReadByte(LPUART0, &data);
+    UART_ReadByte(LPUART2, &data);
     CircularQueue_Enqueue(&queue, data);
 }
 
@@ -198,6 +197,6 @@ static void Serial_Printf(char *format, ...)
     va_end(args);
     for (int i = 0; buffer[i] != '\0'; i++)
     {
-        UART_WriteByte(LPUART0, buffer[i]);
+        UART_WriteByte(LPUART2, buffer[i]);
     }
 }

@@ -13,6 +13,7 @@
 
 __attribute__((section(".share_memory"))) uint32_t BOOT_MODE;
 
+
 char * data;
 int8_t values[2] = {0};
 char* msg;
