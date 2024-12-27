@@ -290,7 +290,7 @@
 								<option id="com.crt.advproject.link.gcc.lto.optmization.level.150460743" name="Link-time optimization level" superClass="com.crt.advproject.link.gcc.lto.optmization.level"/>
 								<option id="com.crt.advproject.link.manage.1324595506" name="Manage linker script" superClass="com.crt.advproject.link.manage" value="false" valueType="boolean"/>
 								<option id="com.crt.advproject.link.script.1968144475" name="Linker script" superClass="com.crt.advproject.link.script" value="boot.ld" valueType="string"/>
-								<option id="com.crt.advproject.link.scriptdir.605776629" name="Script path" superClass="com.crt.advproject.link.scriptdir" value="E:/IoT/Project_Github/fpt_mock_emb/BootLoader/BootLoader_v2" valueType="string"/>
+								<option id="com.crt.advproject.link.scriptdir.605776629" name="Script path" superClass="com.crt.advproject.link.scriptdir" value="&quot;${workspace_loc:/${ProjName}}&quot;" valueType="string"/>
 								<option id="com.crt.advproject.link.crpenable.524927882" name="Enable automatic placement of Code Read Protection field in image" superClass="com.crt.advproject.link.crpenable"/>
 								<option id="com.crt.advproject.link.flashconfigenable.428668953" name="Enable automatic placement of Flash Configuration field in image" superClass="com.crt.advproject.link.flashconfigenable" value="true" valueType="boolean"/>
 								<option id="com.crt.advproject.link.ecrp.747684914" name="Enhanced CRP" superClass="com.crt.advproject.link.ecrp"/>
@@ -716,6 +716,13 @@
 &lt;/TargetConfig&gt;</projectStorage>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/UART_MAIN_lpuart_interrupt"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/UART_MAIN_lpuart_interrupt"/>
+		</configuration>
+	</storageModule>
 	<storageModule moduleId="openCmsis"/>
 </cproject>

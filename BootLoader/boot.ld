@@ -28,13 +28,7 @@ ENTRY(ResetISR)
 
 SECTIONS
 {
-	.user_data (NOLOAD) : ALIGN(4)
-    {
-        __user_data_start__ = .;  
-        KEEP(*(.user_data))       
-        . = ALIGN(4);           
-        __user_data_end__ = .;    
-    } > SRAM
+
     
 	    /* Shared Memory Section */
     .share_memory (NOLOAD) : ALIGN(4)
@@ -44,7 +38,14 @@ SECTIONS
         . = ALIGN(4);
         __share_memory_end__ = .;   /* End address of the shared memory */
     } > SRAM
-	
+    
+	.user_data (NOLOAD) : ALIGN(4)
+    {
+        __user_data_start__ = .;  
+        KEEP(*(.user_data))       
+        . = ALIGN(4);           
+        __user_data_end__ = .;    
+    } > SRAM
      /* MAIN TEXT SECTION */
     .text : ALIGN(4)
     {

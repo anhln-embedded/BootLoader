@@ -289,7 +289,7 @@
 								<option id="com.crt.advproject.link.gcc.lto.optmization.level.1018149455" name="Link-time optimization level" superClass="com.crt.advproject.link.gcc.lto.optmization.level"/>
 								<option id="com.crt.advproject.link.manage.1739635721" name="Manage linker script" superClass="com.crt.advproject.link.manage" value="false" valueType="boolean"/>
 								<option id="com.crt.advproject.link.script.626731371" name="Linker script" superClass="com.crt.advproject.link.script" value="app.ld" valueType="string"/>
-								<option id="com.crt.advproject.link.scriptdir.1532611746" name="Script path" superClass="com.crt.advproject.link.scriptdir" value="E:/IoT/Project_Github/fpt_mock_emb/BootLoader/Datalogger" valueType="string"/>
+								<option id="com.crt.advproject.link.scriptdir.1532611746" name="Script path" superClass="com.crt.advproject.link.scriptdir" value="&quot;${workspace_loc:/${ProjName}}&quot;" valueType="string"/>
 								<option id="com.crt.advproject.link.crpenable.1099017902" name="Enable automatic placement of Code Read Protection field in image" superClass="com.crt.advproject.link.crpenable"/>
 								<option id="com.crt.advproject.link.flashconfigenable.2143210985" name="Enable automatic placement of Flash Configuration field in image" superClass="com.crt.advproject.link.flashconfigenable" value="true" valueType="boolean"/>
 								<option id="com.crt.advproject.link.ecrp.775074708" name="Enhanced CRP" superClass="com.crt.advproject.link.ecrp"/>
